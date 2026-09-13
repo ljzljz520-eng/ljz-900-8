@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace app\boss\controller;
+namespace app\controller\boss;
 
 use app\BaseController;
 use app\common\model\Area;
@@ -59,7 +59,7 @@ class Boss extends BaseController
 
         // 员工排行（整改情况 / 扣分）—— 显式表名以支持 join 别名
         $prefix = (string) config('database.connections.mysql.prefix');
-        $empQuery = Db::name('issue i')
+        $empQuery = Db::name('issue')->alias('i')
             ->join($prefix . 'employee e', 'e.id = i.employee_id', 'LEFT')
             ->field([
                 'i.employee_id',
@@ -78,7 +78,7 @@ class Boss extends BaseController
             ->select()->toArray();
 
         // 区域扣分
-        $areaQuery = Db::name('issue i')
+        $areaQuery = Db::name('issue')->alias('i')
             ->join($prefix . 'area a', 'a.id = i.area_id', 'LEFT')
             ->field([
                 'a.name AS area_name',

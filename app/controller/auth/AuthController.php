@@ -1,10 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace app\auth\controller;
+namespace app\controller\auth;
 
 use app\BaseController;
 use app\common\model\AdminUser;
+use think\facade\Session;
 use think\facade\View;
 use think\response\Redirect;
 
@@ -50,7 +51,7 @@ class AuthController extends BaseController
             'real_name' => $user->real_name,
             'role'      => (int) $user->role,
         ]);
-        session_regenerate_id(true);
+        Session::regenerate(true);
 
         return $this->redirectHome();
     }

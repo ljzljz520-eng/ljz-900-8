@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace app\admin\controller;
+namespace app\controller\admin;
 
 use app\admin\validate\IssueValidate;
 use app\BaseController;

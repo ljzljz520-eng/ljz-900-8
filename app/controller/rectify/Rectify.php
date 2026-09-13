@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace app\rectify\controller;
+namespace app\controller\rectify;
 
 use app\BaseController;
 use app\common\model\Employee;

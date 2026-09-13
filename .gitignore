@@ -7,3 +7,4 @@
 node_modules/
 dist/
 build/
+/sql/install.lock.sql

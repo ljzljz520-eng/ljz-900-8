@@ -7,7 +7,7 @@
         <h1>仓库现场 5S 检查</h1>
         <p class="sub">管理员 / 老板登录入口</p>
 
-        {if session('error')}<div class="alert alert-danger">{$session.error}</div>{/if}
+        {if session('error')}<div class="alert alert-danger">{:session('error')}</div>{/if}
 
         <form method="post" action="{:url('/login')}">
             <div class="form-row">

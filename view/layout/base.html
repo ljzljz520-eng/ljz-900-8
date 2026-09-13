@@ -27,7 +27,7 @@
                 {else/}
                     <a href="{:url('/boss')}">看板</a>
                 {/if}
-                <span class="nav-user">{$session.user.real_name|default=''}</span>
+                <span class="nav-user">{:session('user.real_name') ?: ''}</span>
                 <form method="post" action="{:url('/logout')}" class="inline">
                     <button class="btn btn-ghost btn-sm" type="submit">退出</button>
                 </form>
@@ -38,10 +38,10 @@
 
 <main class="container">
     {if session('success')}
-        <div class="alert alert-success">{$session.success}</div>
+        <div class="alert alert-success">{:session('success')}</div>
     {/if}
     {if session('error')}
-        <div class="alert alert-danger">{$session.error}</div>
+        <div class="alert alert-danger">{:session('error')}</div>
     {/if}
     {block name="body"}{/block}
 </main>

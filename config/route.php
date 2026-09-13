@@ -6,7 +6,7 @@ return [
     'url_common_param'      => true,
     'url_param_type'        => 0,
     'url_route_must'        => false,
-    'route_complete_match'  => false,
+    'route_complete_match'  => true,
     'request_cache'         => false,
     'request_cache_expire'  => null,
     'request_cache_except'  => [],
