@@ -1,0 +1,81 @@
+{extend name="layout/base" /}
+{block name="title"}检查项管理{/block}
+{block name="body"}
+<div class="card-title-row"><h2>5S 检查项</h2></div>
+
+<div class="card">
+<form class="filter-bar" method="post" action="{:url('/admin/items')}">
+    <div class="field"><label>5S 分类 *</label>
+        <select name="category" required>
+            {volist name="categories" id="c"}<option value="{$c}">{$c}</option>{/volist}
+        </select>
+    </div>
+    <div class="field" style="flex:2;"><label>检查内容 *</label><input type="text" name="content" required placeholder="如 通道保持畅通无杂物"></div>
+    <div class="field"><label>标准扣分</label><input type="number" name="max_score" value="5" min="0" max="20" style="width:100px;min-width:0;"></div>
+    <div class="field"><label>排序</label><input type="number" name="sort" value="0" style="width:80px;min-width:0;"></div>
+    <button class="btn" type="submit">添加</button>
+</form>
+</div>
+
+<div class="card">
+<div class="table-wrap">
+<table class="tbl" id="itemTable">
+    <thead><tr><th>ID</th><th>分类</th><th>检查内容</th><th>标准扣分</th><th>排序</th><th>状态</th><th>操作</th></tr></thead>
+    <tbody>
+    {volist name="list" id="it"}
+    <tr data-id="{$it.id}">
+        <td>{$it.id}</td>
+        <td>
+            <select data-name="category" style="width:80px;">
+                {volist name="categories" id="c"}
+                <option value="{$c}" {if $it.category==$c}selected{/if}>{$c}</option>
+                {/volist}
+            </select>
+        </td>
+        <td><input type="text" data-name="content" value="{$it.content}" required></td>
+        <td><input type="number" data-name="max_score" value="{$it.max_score}" min="0" max="20" style="width:75px;"></td>
+        <td><input type="number" data-name="sort" value="{$it.sort}" style="width:70px;"></td>
+        <td>
+            <select data-name="status" style="width:80px;">
+                <option value="1" {if $it.status==1}selected{/if}>启用</option>
+                <option value="0" {if $it.status==0}selected{/if}>停用</option>
+            </select>
+        </td>
+        <td style="white-space:nowrap;">
+            <button class="btn btn-sm js-save" type="button">保存</button>
+            <button class="btn btn-sm btn-danger js-del" type="button">删除</button>
+        </td>
+    </tr>
+    {/volist}
+    </tbody>
+</table>
+</div>
+<div class="pagination">{$list->render()|raw}</div>
+</div>
+{/block}
+
+{block name="script"}
+<script>
+document.getElementById('itemTable').addEventListener('click', function (ev) {
+    var btn = ev.target.closest('button');
+    if (!btn) return;
+    var tr = btn.closest('tr');
+    var id = tr.dataset.id;
+
+    if (btn.classList.contains('js-save')) {
+        var data = {};
+        tr.querySelectorAll('[data-name]').forEach(function (el) { data[el.dataset.name] = el.value; });
+        fetch('/admin/items/' + id, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-Requested-With': 'fetch'},
+            body: JSON.stringify(data)
+        }).then(function (r) { return r.json(); }).then(function () { location.reload(); });
+    }
+    if (btn.classList.contains('js-del')) {
+        if (!confirm('确定删除该检查项？')) return;
+        fetch('/admin/items/' + id + '/delete', {method: 'POST'})
+            .then(function () { location.reload(); });
+    }
+});
+</script>
+{/block}

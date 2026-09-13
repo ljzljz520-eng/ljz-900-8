@@ -1,0 +1,33 @@
+{
+    "name": "warehouse/inspection5s",
+    "description": "仓库现场 5S 检查网站（管理员开单 / 员工扫码整改 / 老板看板）",
+    "type": "project",
+    "keywords": [
+        "thinkphp",
+        "5s",
+        "warehouse",
+        "inspection"
+    ],
+    "require": {
+        "php": ">=8.0.0",
+        "ext-gd": "*",
+        "ext-json": "*",
+        "topthink/framework": "^8.0",
+        "topthink/think-view": "^2.0",
+        "topthink/think-filesystem": "^2.0",
+        "endroid/qr-code": "^4.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "app\\": "app"
+        },
+        "files": [
+            "app/common.php"
+        ]
+    },
+    "config": {
+        "preferred-install": "dist",
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}

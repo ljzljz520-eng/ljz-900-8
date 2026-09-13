@@ -1,0 +1,99 @@
+{extend name="layout/base" /}
+{block name="title"}扫码整改 · {$issue.code}{/block}
+{block name="body"}
+<div class="mobile-wrap">
+
+    {if $issue.status == 0}
+    <div class="reminder">⏰ 该项目前为<strong>「待整改」</strong>，请处理后拍照提交。</div>
+    {elseif $issue.status == 1 /}
+    <div class="alert alert-success">✅ 整改照片已提交，等待管理员复核，无需重复提交。</div>
+    {else/}
+    <div class="alert alert-success">✅ 该问题已复核通过，感谢配合！</div>
+    {/if}
+
+    <div class="mobile-card">
+        <h2>{$issue.area.name|default='未知区域'}</h2>
+        <p class="muted" style="margin:4px 0 10px;">单号 {$issue.code} · 检查日期 {$issue.check_date} · 扣分 <b class="text-danger">-{$issue.deduct_score}</b></p>
+        <p><span class="badge badge-cat">{$issue.checkItem.category|default=''}</span>
+           {$issue.checkItem.content|default=''}</p>
+        {if $issue.description}<p class="muted">管理员备注：{$issue.description}</p>{/if}
+
+        <p style="margin-bottom:6px;font-weight:600;">问题图（Before）</p>
+        {if $issue.photo_before}
+        <img class="photo-big" src="{:img_url($issue.photo_before)}" alt="问题图" style="max-width:100%;">
+        {else/}
+        <div class="photo-placeholder-big">无问题图</div>
+        {/if}
+    </div>
+
+    {if $issue.status == 0}
+    <div class="mobile-card">
+        <h2>提交整改</h2>
+        <form method="post" action="{:url('/r/'.$issue.code)}" enctype="multipart/form-data" id="rectifyForm">
+            <div class="form-row">
+                <label>整改责任人 *</label>
+                <select name="employee_id" required>
+                    <option value="">请选择本人</option>
+                    {volist name="employees" id="e"}
+                    <option value="{$e.id}" {if $issue.employee_id==$e.id}selected{/if}>
+                        {$e.name}{$e.job_no ? '（'.$e.job_no.'）' : ''}
+                    </option>
+                    {/volist}
+                </select>
+            </div>
+            <div class="form-row">
+                <label>整改口令（4 位数字）*</label>
+                <input type="password" name="pin" inputmode="numeric" maxlength="4"
+                       pattern="\d{4}" required placeholder="请输入班组长下发的口令">
+            </div>
+            <div class="form-row">
+                <label>整改后照片（After）*</label>
+                <label class="upload-slot" for="photo_after" id="uploadLabel">
+                    <span class="cam">📷</span>
+                    <span>点击拍照 / 从相册选择整改后照片</span>
+                </label>
+                <input type="file" name="photo_after" id="photo_after" accept="image/*"
+                       capture="environment" required style="display:none;">
+            </div>
+            <div class="form-row">
+                <label>整改说明（选填）</label>
+                <textarea name="remark" maxlength="500" placeholder="如：已清理通道并定位摆放"></textarea>
+            </div>
+            <button class="btn btn-block" type="submit">提交整改</button>
+        </form>
+    </div>
+    {else/}
+    <div class="mobile-card">
+        <h2>整改后图（After）</h2>
+        {if $issue.photo_after}
+        <img class="photo-big" src="{:img_url($issue.photo_after)}" alt="整改图" style="max-width:100%;">
+        {if $issue.rectify_remark}<p class="muted" style="margin-top:8px;">整改说明：{$issue.rectify_remark}</p>{/if}
+        {if $issue.rectified_at}<p class="muted">提交时间：{$issue.rectified_at}</p>{/if}
+        {else/}
+        <div class="photo-placeholder-big">
+            <span style="font-size:34px;">⏳</span>
+            未整改占位提醒
+            <span class="sub">暂无整改后照片</span>
+        </div>
+        {/if}
+    </div>
+    {/if}
+</div>
+{/block}
+
+{block name="script"}
+<script>
+(function () {
+    var input = document.getElementById('photo_after');
+    var label = document.getElementById('uploadLabel');
+    if (input && label) {
+        input.addEventListener('change', function () {
+            var f = input.files[0];
+            if (!f) return;
+            var url = URL.createObjectURL(f);
+            label.innerHTML = '<img src="' + url + '" alt="整改图预览">';
+        });
+    }
+})();
+</script>
+{/block}

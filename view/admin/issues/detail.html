@@ -1,0 +1,80 @@
+{extend name="layout/base" /}
+{block name="title"}问题单 {$issue.code} · 5S{/block}
+{block name="body"}
+<div class="card-title-row">
+    <h2>问题单 {$issue.code}
+        <span class="badge {:status_class($issue.status)}">{:status_text($issue.status)}</span>
+    </h2>
+    <div>
+        <a class="btn btn-light" href="{:url('/admin/issues')}">返回列表</a>
+        <a class="btn" href="{:url('/admin/issues/create')}">继续开单</a>
+    </div>
+</div>
+
+{if $issue.status == 0}
+<div class="reminder">⏰ 该问题<strong>尚未整改</strong>，请将下方二维码张贴/下发到现场，员工用手机扫码提交整改照片。</div>
+{/if}
+
+<div class="detail-grid">
+    <div class="card">
+        <h2>问题信息</h2>
+        <dl class="kv">
+            <dt>所在区域</dt><dd>{$issue.area.name|default='-'}</dd>
+            <dt>检查项</dt><dd><span class="badge badge-cat">{$issue.checkItem.category|default=''}</span>
+                              {$issue.checkItem.content|default='-'}</dd>
+            <dt>检查日期</dt><dd>{$issue.check_date}</dd>
+            <dt>扣分</dt><dd class="text-danger"><strong>-{$issue.deduct_score} 分</strong></dd>
+            <dt>开单人</dt><dd>{$issue.inspector.real_name|default='-'}</dd>
+            <dt>责任人</dt><dd>{$issue.employee.name|default='<span class="muted">未指定，扫码时选择</span>'}</dd>
+            <dt>问题描述</dt><dd>{$issue.description|default='<span class="muted">无</span>'}</dd>
+            <dt>整改时间</dt><dd>{$issue.rectified_at|default='<span class="muted">尚未整改</span>'}</dd>
+            <dt>整改说明</dt><dd>{$issue.rectify_remark|default='<span class="muted">无</span>'}</dd>
+        </dl>
+
+        {if $issue.status == 1}
+        <div class="form-actions">
+            <form method="post" action="{:url('/admin/issues/'.$issue.id.'/review')}">
+                <input type="hidden" name="action" value="pass">
+                <button class="btn" type="submit">✅ 复核通过</button>
+            </form>
+            <form method="post" action="{:url('/admin/issues/'.$issue.id.'/review')}"
+                  onsubmit="return confirm('确定驳回？员工需重新扫码整改。');">
+                <input type="hidden" name="action" value="reject">
+                <button class="btn btn-danger" type="submit">驳回整改</button>
+            </form>
+        </div>
+        {/if}
+    </div>
+
+    <div class="card qr-box">
+        <h2>现场整改二维码</h2>
+        <img src="{$qrUrl}" alt="整改二维码">
+        <p class="qr-url">扫码地址：{$domain}{:url('/r/'.$issue.code)}</p>
+        <p class="muted" style="font-size:12px;">员工微信/相机扫码 → 选择本人 → 输入 4 位口令 → 上传整改后照片</p>
+    </div>
+</div>
+
+<div class="card">
+    <h2>图片对比（Before / After）</h2>
+    <div class="pair-imgs" style="grid-template-columns:1fr 1fr; max-width:760px;">
+        <div class="slot">
+            <span class="tag">问题图</span>
+            {if $issue.photo_before}
+            <img src="{:img_url($issue.photo_before)}" alt="问题图" style="height:280px;">
+            {else/}<div class="after-empty" style="height:280px;">无问题图</div>{/if}
+        </div>
+        <div class="slot">
+            <span class="tag">整改后图</span>
+            {if $issue.photo_after}
+            <img src="{:img_url($issue.photo_after)}" alt="整改图" style="height:280px;">
+            {else/}
+            <div class="after-empty" style="height:280px;">
+                <span class="clock">⏳</span>
+                <strong>未整改占位提醒</strong>
+                <span>员工扫码上传后在此显示</span>
+            </div>
+            {/if}
+        </div>
+    </div>
+</div>
+{/block}

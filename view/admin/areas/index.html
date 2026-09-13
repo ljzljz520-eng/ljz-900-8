@@ -1,0 +1,71 @@
+{extend name="layout/base" /}
+{block name="title"}区域管理{/block}
+{block name="body"}
+<div class="card-title-row"><h2>仓库区域</h2></div>
+
+<div class="card">
+<form class="filter-bar" method="post" action="{:url('/admin/areas')}">
+    <div class="field"><label>区域名称 *</label><input type="text" name="name" required placeholder="如 F区-退货区"></div>
+    <div class="field"><label>编码</label><input type="text" name="code" placeholder="F-01"></div>
+    <div class="field"><label>负责人</label><input type="text" name="manager" placeholder="负责人姓名"></div>
+    <div class="field"><label>排序</label><input type="number" name="sort" value="0" style="width:90px;min-width:0;"></div>
+    <button class="btn" type="submit">添加区域</button>
+</form>
+</div>
+
+<div class="card">
+<div class="table-wrap">
+<table class="tbl" id="areaTable">
+    <thead><tr><th>ID</th><th>名称</th><th>编码</th><th>负责人</th><th>排序</th><th>状态</th><th>操作</th></tr></thead>
+    <tbody>
+    {volist name="list" id="a"}
+    <tr data-id="{$a.id}">
+        <td>{$a.id}</td>
+        <td><input type="text" data-name="name" value="{$a.name}" required></td>
+        <td><input type="text" data-name="code" value="{$a.code|default=''}" style="width:100px;"></td>
+        <td><input type="text" data-name="manager" value="{$a.manager|default=''}" style="width:110px;"></td>
+        <td><input type="number" data-name="sort" value="{$a.sort}" style="width:70px;"></td>
+        <td>
+            <select data-name="status" style="width:80px;">
+                <option value="1" {if $a.status==1}selected{/if}>启用</option>
+                <option value="0" {if $a.status==0}selected{/if}>停用</option>
+            </select>
+        </td>
+        <td style="white-space:nowrap;">
+            <button class="btn btn-sm js-save" type="button">保存</button>
+            <button class="btn btn-sm btn-danger js-del" type="button">删除</button>
+        </td>
+    </tr>
+    {/volist}
+    </tbody>
+</table>
+</div>
+<div class="pagination">{$list->render()|raw}</div>
+</div>
+{/block}
+
+{block name="script"}
+<script>
+document.getElementById('areaTable').addEventListener('click', function (ev) {
+    var btn = ev.target.closest('button');
+    if (!btn) return;
+    var tr = btn.closest('tr');
+    var id = tr.dataset.id;
+
+    if (btn.classList.contains('js-save')) {
+        var data = {};
+        tr.querySelectorAll('[data-name]').forEach(function (el) { data[el.dataset.name] = el.value; });
+        fetch('/admin/areas/' + id, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-Requested-With': 'fetch'},
+            body: JSON.stringify(data)
+        }).then(function () { location.reload(); });
+    }
+    if (btn.classList.contains('js-del')) {
+        if (!confirm('确定删除该区域？')) return;
+        fetch('/admin/areas/' + id + '/delete', {method: 'POST'})
+            .then(function () { location.reload(); });
+    }
+});
+</script>
+{/block}

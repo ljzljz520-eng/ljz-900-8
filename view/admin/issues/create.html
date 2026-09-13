@@ -1,0 +1,78 @@
+{extend name="layout/base" /}
+{block name="title"}现场开单 · 5S 检查{/block}
+{block name="body"}
+<div class="card-title-row">
+    <h2>📷 现场开单（上传问题图）</h2>
+    <a href="{:url('/admin/issues')}">返回列表</a>
+</div>
+
+<div class="card">
+<form method="post" action="{:url('/admin/issues')}" enctype="multipart/form-data">
+    <div class="form-grid">
+        <div class="form-row">
+            <label>所在区域 <span class="text-danger">*</span></label>
+            <select name="area_id" required>
+                <option value="">请选择区域</option>
+                {volist name="areas" id="a"}
+                <option value="{$a.id}">{$a.name}</option>
+                {/volist}
+            </select>
+        </div>
+        <div class="form-row">
+            <label>整改责任人（可不指定，扫码时选择）</label>
+            <select name="employee_id">
+                <option value="0">— 不指定 —</option>
+                {volist name="employees" id="e"}
+                <option value="{$e.id}" data-area="{$e.area_id}">{$e.name}{$e.job_no ? '（'.$e.job_no.'）' : ''}</option>
+                {/volist}
+            </select>
+        </div>
+        <div class="form-row">
+            <label>检查日期 <span class="text-danger">*</span></label>
+            <input type="date" name="check_date" value="{$today}" required>
+        </div>
+        <div class="form-row">
+            <label>扣分 <span class="text-danger">*</span></label>
+            <input type="number" name="deduct_score" id="deduct_score" value="3" min="0" max="20" required>
+            <span class="hint">选择检查项后会自动带入标准扣分，可手动调整</span>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <label>检查项 <span class="text-danger">*</span></label>
+        <select name="check_item_id" id="check_item_id" required>
+            <option value="">请选择检查项</option>
+            {volist name="groups" id="items" key="cat"}
+            <optgroup label="【{$cat}】">
+                {volist name="items" id="it"}
+                <option value="{$it.id}" data-score="{$it.max_score}">[{$it.category}] {$it.content}（标准扣 {$it.max_score} 分）</option>
+                {/volist}
+            </optgroup>
+            {/volist}
+        </select>
+    </div>
+
+    <div class="form-row">
+        <label>问题描述</label>
+        <textarea name="description" maxlength="500" placeholder="描述现场问题、位置等（不超过 500 字）"></textarea>
+    </div>
+
+    <div class="form-row">
+        <label>现场问题图 <span class="text-danger">*</span></label>
+        <input type="file" name="photo" id="photo" accept="image/*" capture="environment" required>
+        <div style="margin-top:10px;">
+            <img id="preview" class="photo-big" style="display:none;" alt="问题图预览">
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <button class="btn" type="submit">保存并生成整改二维码</button>
+        <a class="btn btn-light" href="{:url('/admin/issues')}">取消</a>
+    </div>
+</form>
+</div>
+{/block}
+
+{block name="script"}
+<script src="/static/js/issue-form.js"></script>
+{/block}

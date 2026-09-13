@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{block name="title"}仓库 5S 检查{/block}</title>
+    <link rel="stylesheet" href="/static/css/app.css?v=1">
+    {block name="head"}{/block}
+</head>
+<body>
+<header class="topbar">
+    <div class="topbar-inner">
+        <a class="brand" href="{:url('/')}">
+            <span class="brand-logo">🏭</span>
+            <span>仓库现场 5S 检查</span>
+        </a>
+        <nav class="nav">
+            {if session('user.id')}
+                {if session('user.role') == 1}
+                    <a href="{:url('/admin')}">工作台</a>
+                    <a href="{:url('/admin/issues')}">问题单</a>
+                    <a href="{:url('/admin/issues/create')}">+ 开单</a>
+                    <a href="{:url('/admin/areas')}">区域</a>
+                    <a href="{:url('/admin/items')}">检查项</a>
+                    <a href="{:url('/admin/employees')}">员工</a>
+                    <a href="{:url('/boss')}">老板看板</a>
+                {else/}
+                    <a href="{:url('/boss')}">看板</a>
+                {/if}
+                <span class="nav-user">{$session.user.real_name|default=''}</span>
+                <form method="post" action="{:url('/logout')}" class="inline">
+                    <button class="btn btn-ghost btn-sm" type="submit">退出</button>
+                </form>
+            {/if}
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+    {if session('success')}
+        <div class="alert alert-success">{$session.success}</div>
+    {/if}
+    {if session('error')}
+        <div class="alert alert-danger">{$session.error}</div>
+    {/if}
+    {block name="body"}{/block}
+</main>
+
+<footer class="footer">仓库现场 5S 检查系统 · 整理 · 整顿 · 清扫 · 清洁 · 素养</footer>
+{block name="script"}{/block}
+</body>
+</html>

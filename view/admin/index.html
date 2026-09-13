@@ -1,0 +1,68 @@
+{extend name="layout/base" /}
+{block name="title"}工作台 · 5S 检查{/block}
+{block name="body"}
+<div class="card-title-row">
+    <h2>管理员工作台</h2>
+    <a class="btn" href="{:url('/admin/issues/create')}">+ 现场开单（上传问题图）</a>
+</div>
+
+<div class="stat-grid">
+    <div class="stat"><div class="num">{$stats.total}</div><div class="label">问题单总数</div></div>
+    <div class="stat"><div class="num text-danger">{$stats.pending}</div><div class="label">待整改（占位提醒）</div></div>
+    <div class="stat"><div class="num text-ok">{$stats.done}</div><div class="label">已整改/复核</div></div>
+    <div class="stat"><div class="num text-warn">{$stats.rate}%</div><div class="label">整改完成率</div></div>
+    <div class="stat"><div class="num">{$stats.today}</div><div class="label">今日开单</div></div>
+    <div class="stat"><div class="num text-danger">{$stats.deductSum}</div><div class="label">累计扣分</div></div>
+    <div class="stat"><div class="num">{$stats.areaCount}</div><div class="label">启用区域</div></div>
+    <div class="stat"><div class="num">{$stats.staffCount}</div><div class="label">在职员工</div></div>
+</div>
+
+<div class="card" style="margin-top:18px;">
+    <div class="card-title-row">
+        <h2 class="mt0">⏰ 待整改提醒</h2>
+        <a href="{:url('/admin/issues', ['status' => 0])}">查看全部 →</a>
+    </div>
+    {if $pendingList->isEmpty()}
+        <p class="muted mb0">🎉 太棒了，当前没有待整改项。</p>
+    {else/}
+        <div class="table-wrap">
+        <table class="tbl">
+            <thead><tr><th>单号</th><th>日期</th><th>区域</th><th>检查项</th><th>扣分</th><th>责任人</th><th>状态</th><th>操作</th></tr></thead>
+            <tbody>
+            {volist name="pendingList" id="row"}
+            <tr>
+                <td><a href="{:url('/admin/issues/'.$row.id)}">{$row.code}</a></td>
+                <td>{$row.check_date}</td>
+                <td>{$row.area.name|default='-'}</td>
+                <td><span class="badge badge-cat">{$row.checkItem.category|default=''}</span>
+                    {$row.checkItem.content|default='-'}</td>
+                <td><b class="text-danger">-{$row.deduct_score}</b></td>
+                <td>{$row.employee.name|default='<span class="muted">未指定</span>'}</td>
+                <td><span class="badge {:status_class($row.status)}">{:status_text($row.status)}</span></td>
+                <td><a class="btn btn-sm btn-light" href="{:url('/admin/issues/'.$row.id)}">二维码/详情</a></td>
+            </tr>
+            {/volist}
+            </tbody>
+        </table>
+        </div>
+    {/if}
+</div>
+
+<div class="card">
+    <h2>近 7 天检查趋势</h2>
+    {if empty($trend)}
+        <p class="muted mb0">近 7 天暂无检查记录。</p>
+    {else/}
+        <div class="table-wrap">
+        <table class="tbl">
+            <thead><tr><th>日期</th><th>开单数</th><th>扣分合计</th></tr></thead>
+            <tbody>
+            {volist name="trend" id="t"}
+            <tr><td>{$t.check_date}</td><td>{$t.cnt}</td><td class="text-danger">{$t.score}</td></tr>
+            {/volist}
+            </tbody>
+        </table>
+        </div>
+    {/if}
+</div>
+{/block}

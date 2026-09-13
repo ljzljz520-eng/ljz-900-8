@@ -1,0 +1,138 @@
+{extend name="layout/base" /}
+{block name="title"}老板看板 · 5S{/block}
+{block name="body"}
+<div class="card-title-row">
+    <h2>📊 老板看板 · 图片对追溯</h2>
+    <span class="muted">按员工 / 区域 / 日期查看「问题图 → 整改图」</span>
+</div>
+
+<div class="card">
+<form class="filter-bar" method="get" action="{:url('/boss')}">
+    <div class="field"><label>开始日期</label>
+        <input type="date" name="start_date" value="{$startDate}"></div>
+    <div class="field"><label>结束日期</label>
+        <input type="date" name="end_date" value="{$endDate}"></div>
+    <div class="field"><label>区域</label>
+        <select name="area_id">
+            <option value="0">全部区域</option>
+            {volist name="areas" id="a"}
+            <option value="{$a.id}" {if $areaId==$a.id}selected{/if}>{$a.name}</option>
+            {/volist}
+        </select>
+    </div>
+    <div class="field"><label>员工</label>
+        <select name="employee_id">
+            <option value="0">全部员工</option>
+            {volist name="employees" id="e"}
+            <option value="{$e.id}" {if $employeeId==$e.id}selected{/if}>{$e.name}</option>
+            {/volist}
+        </select>
+    </div>
+    <button class="btn" type="submit">查看</button>
+    <a class="btn btn-light" href="{:url('/boss')}">本月</a>
+</form>
+</div>
+
+<div class="stat-grid">
+    <div class="stat"><div class="num">{$total}</div><div class="label">问题总数</div></div>
+    <div class="stat"><div class="num text-ok">{$done}</div><div class="label">已整改/复核</div></div>
+    <div class="stat"><div class="num text-danger">{$pending}</div><div class="label">未整改</div></div>
+    <div class="stat"><div class="num text-warn">{$rate}%</div><div class="label">整改完成率</div></div>
+    <div class="stat"><div class="num text-danger">{$scoreSum}</div><div class="label">扣分合计</div></div>
+</div>
+
+<div class="detail-grid" style="margin-top:18px;">
+    <div class="card">
+        <h2>员工扣分排行（TOP 10）</h2>
+        {if empty($ranking)}<p class="muted mb0">暂无数据</p>{else/}
+        <div class="table-wrap">
+        <table class="tbl">
+            <thead><tr><th>#</th><th>员工</th><th>问题数</th><th>未整改</th><th>扣分</th></tr></thead>
+            <tbody>
+            {volist name="ranking" id="r"}
+            <tr>
+                <td>{$i}</td>
+                <td>{$r.employee_name|default='<span class="muted">未指定</span>'}</td>
+                <td>{$r.cnt}</td>
+                <td>{if $r.pending_cnt > 0}<span class="text-danger"><b>{$r.pending_cnt}</b></span>{else/}0{/if}</td>
+                <td><b class="text-danger">{$r.score}</b></td>
+            </tr>
+            {/volist}
+            </tbody>
+        </table>
+        </div>
+        {/if}
+    </div>
+    <div class="card">
+        <h2>区域扣分统计</h2>
+        {if empty($areaStats)}<p class="muted mb0">暂无数据</p>{else/}
+        <div class="table-wrap">
+        <table class="tbl">
+            <thead><tr><th>区域</th><th>问题数</th><th>未整改</th><th>扣分</th></tr></thead>
+            <tbody>
+            {volist name="areaStats" id="r"}
+            <tr>
+                <td>{$r.area_name|default='-'}</td>
+                <td>{$r.cnt}</td>
+                <td>{if $r.pending_cnt > 0}<span class="text-danger"><b>{$r.pending_cnt}</b></span>{else/}0{/if}</td>
+                <td><b class="text-danger">{$r.score}</b></td>
+            </tr>
+            {/volist}
+            </tbody>
+        </table>
+        </div>
+        {/if}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-title-row">
+        <h2 class="mt0">现场图片对（{$startDate} ~ {$endDate}）</h2>
+        <span class="muted">共 {$total} 项，未整改项以红色占位提醒</span>
+    </div>
+
+    {if $list->isEmpty()}
+        <p class="muted mb0">当前条件下没有检查记录。</p>
+    {else/}
+    <div class="pair-grid">
+        {volist name="list" id="row"}
+        <div class="pair-card">
+            <div class="pc-head">
+                <div>
+                    <b>{$row.area.name|default='-'}</b>
+                    <div class="muted" style="font-size:11.5px;">{$row.check_date} · {$row.code}</div>
+                </div>
+                <span class="badge {:status_class($row.status)}">{:status_text($row.status)}</span>
+            </div>
+            <div class="pair-imgs">
+                <div class="slot">
+                    <span class="tag">问题 -{$row.deduct_score}</span>
+                    {if $row.photo_before}
+                    <img src="{:img_url($row.photo_before)}" alt="问题图" loading="lazy">
+                    {else/}<div class="after-empty"><span class="clock">🖼️</span>无问题图</div>{/if}
+                </div>
+                <div class="slot">
+                    <span class="tag">整改后</span>
+                    {if $row.photo_after}
+                    <img src="{:img_url($row.photo_after)}" alt="整改图" loading="lazy">
+                    {else/}
+                    <div class="after-empty">
+                        <span class="clock">⏳</span>
+                        <strong>未整改占位提醒</strong>
+                        <span>责任人：{$row.employee.name|default='待扫码'}</span>
+                    </div>
+                    {/if}
+                </div>
+            </div>
+            <div class="pc-meta">
+                <span class="badge badge-cat">{$row.checkItem.category|default=''}</span>
+                {$row.checkItem.content|default='-'}<br>
+                责任人：{$row.employee.name|default='<span class="text-danger">未指定</span>'}
+            </div>
+        </div>
+        {/volist}
+    </div>
+    <div class="pagination">{$list->render()|raw}</div>
+    {/if}
+</div>
+{/block}
