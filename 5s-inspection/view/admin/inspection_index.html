@@ -1,0 +1,70 @@
+{extend name="layout/base" /}
+{block name="sidebar"}
+<aside class="sidebar">
+  <a href="/admin">📊 管理看板</a>
+  <a href="/admin/inspection" class="active">📝 检查问题</a>
+  <a href="/admin/inspection/create">➕ 发布问题</a>
+  <a href="/admin/area">📍 区域与二维码</a>
+  <a href="/admin/check-item">☑️ 检查项管理</a>
+</aside>
+{/block}
+{block name="content"}
+<div class="page-title">检查问题列表
+  <a class="btn sm green" href="/admin/inspection/create" style="margin-left:auto">➕ 发布问题</a>
+</div>
+
+<form class="filter-bar" method="get">
+  <div class="f"><label>区域</label>
+    <select name="area_id">
+      <option value="0">全部区域</option>
+      {volist name="areas" id="a"}
+      <option value="{$a.id}" {if $areaId==$a.id}selected{/if}>{$a.name}</option>
+      {/volist}
+    </select>
+  </div>
+  <div class="f"><label>状态</label>
+    <select name="status">
+      <option value="">全部</option>
+      <option value="0" {if $status==='0'}selected{/if}>待整改</option>
+      <option value="1" {if $status==='1'}selected{/if}>已整改</option>
+    </select>
+  </div>
+  <div class="f"><label>检查日期</label><input type="date" name="date" value="{$date}"></div>
+  <div class="f"><label>单号/描述</label><input type="text" name="keyword" value="{$keyword}" placeholder="搜索..."></div>
+  <button class="btn" type="submit">查询</button>
+  <a class="btn gray" href="/admin/inspection">重置</a>
+</form>
+
+<div class="card" style="padding:0;overflow-x:auto">
+<table class="table">
+  <thead><tr>
+    <th>单号</th><th>缩略图</th><th>区域</th><th>检查项</th><th>扣分</th>
+    <th>责任人</th><th>检查人</th><th>状态</th><th>检查日期</th><th>操作</th>
+  </tr></thead>
+  <tbody>
+  {volist name="list" id="r"}
+    <tr>
+      <td nowrap><a href="/admin/inspection/detail/id/{$r.id}">{$r.inspect_no}</a></td>
+      <td><a href="/admin/inspection/detail/id/{$r.id}">
+        <img src="{:asset_url($r.problem_image)}" style="width:56px;height:42px;object-fit:cover;border-radius:4px"></a></td>
+      <td>{$r.area.name}</td>
+      <td>{$r.check_item.title}</td>
+      <td style="color:#e74c3c;font-weight:600">-{$r.deduct_score}</td>
+      <td>{if $r.assignee}{$r.assignee.real_name}{else}<span class='muted'>未指派</span>{/if}</td>
+      <td>{$r.inspector.real_name}</td>
+      <td>{if $r.status==1}<span class="badge done">已整改</span>{else}<span class="badge pending">待整改</span>{/if}</td>
+      <td nowrap>{$r.inspect_date}</td>
+      <td nowrap>
+        <a class="btn sm" href="/admin/inspection/detail/id/{$r.id}">详情</a>
+        <button class="btn sm danger" onclick="confirmPost('/admin/inspection/delete/id/{$r.id}','确定删除该问题及整改记录?')">删除</button>
+      </td>
+    </tr>
+  {/volist}
+  {if $list->isEmpty()}
+    <tr><td colspan="10" class="empty">没有符合条件的记录</td></tr>
+  {/if}
+  </tbody>
+</table>
+</div>
+<div class="pagination">{$list->render()|raw}</div>
+{/block}

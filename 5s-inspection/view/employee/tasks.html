@@ -1,0 +1,60 @@
+{extend name="layout/base" /}
+{block name="sidebar"}
+<aside class="sidebar">
+  <a href="/employee/tasks" class="active">📋 我的整改任务</a>
+</aside>
+{/block}
+{block name="content"}
+<div class="page-title">📋 我的整改任务 <span class="muted" style="font-size:13px">（指派给我 + 可认领）</span></div>
+
+<form class="filter-bar" method="get">
+  <div class="f"><label>区域</label>
+    <select name="area_id">
+      <option value="0">全部</option>
+      {volist name="areas" id="a"}<option value="{$a.id}" {if $areaId==$a.id}selected{/if}>{$a.name}</option>{/volist}
+    </select>
+  </div>
+  <div class="f"><label>状态</label>
+    <select name="status">
+      <option value="">全部</option>
+      <option value="0" {if $status==='0'}selected{/if}>待整改</option>
+      <option value="1" {if $status==='1'}selected{/if}>已整改</option>
+    </select>
+  </div>
+  <button class="btn" type="submit">筛选</button>
+</form>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px">
+{volist name="list" id="r"}
+  <div class="card" style="margin:0">
+    <div class="flex" style="justify-content:space-between">
+      <b>{$r.area.name}</b>
+      {if $r.status==1}<span class="badge done">已整改</span>{else}<span class="badge pending">待整改</span>{/if}
+    </div>
+    <p class="mt10">{$r.check_item.title}</p>
+    <div class="pair mt10">
+      <div class="shot"><span class="tag b">问题</span><img src="{:asset_url($r.problem_image)}"></div>
+      <div class="arrow">➜</div>
+      {if $r.rectification}
+      <div class="shot"><span class="tag a">整改</span><img src="{:asset_url($r.rectification.repair_image)}"></div>
+      {else}
+      <div class="placeholder">
+        <div class="ph-icon">🚧</div><div class="ph-title">待整改占位</div>
+        <div class="ph-sub">尚未提交整改照片</div>
+      </div>
+      {/if}
+    </div>
+    <div class="m-meta mt10"><span>📅 {$r.inspect_date}</span><span>⚠️ {$r.deduct_score}分</span></div>
+    <div class="mt10">
+      {if $r.status==0}
+        <a class="btn green sm" href="/employee/repair/id/{$r.id}">📷 去整改</a>
+      {else}
+        <a class="btn sm gray" href="/employee/finish/id/{$r.id}">查看对比</a>
+      {/if}
+    </div>
+  </div>
+{/volist}
+</div>
+{if $list->isEmpty()}<div class="card empty">暂无任务记录</div>{/if}
+<div class="pagination">{$list->render()|raw}</div>
+{/block}

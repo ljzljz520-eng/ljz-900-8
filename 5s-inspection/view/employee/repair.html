@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>拍照整改</title>
+<link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+<div class="mobile">
+  <div class="mobile-header">
+    <h2>📷 拍照整改</h2>
+    <p>{$row.area.name} · {$row.inspect_no}</p>
+  </div>
+
+  <div class="m-card">
+    <div class="m-body">
+      <div class="m-title"><span class="badge cat">[{$row.check_item.category}]</span> {$row.check_item.title}</div>
+      <p class="muted mt10" style="font-size:13px">判定标准: {$row.check_item.standard|default='—'}</p>
+      {if $row.description}
+      <p class="mt10" style="background:#fff8e8;border-left:3px solid #e0a040;padding:8px 10px;border-radius:4px;font-size:13px">
+        📝 {$row.description}
+      </p>{/if}
+      <div class="m-meta mt10">
+        <span>⚠️ 扣 {$row.deduct_score} 分</span><span>期限: {$row.deadline|default='—'}</span>
+      </div>
+      <p class="mt10"><b>问题现场：</b></p>
+      <img src="{:asset_url($row.problem_image)}" style="border-radius:8px;margin-top:6px" alt="问题图">
+    </div>
+  </div>
+
+  <form class="m-card" style="padding:15px" action="/employee/submit/id/{$row.id}" method="post"
+        enctype="multipart/form-data" onsubmit="return postForm(this)">
+    <div class="form-row">
+      <label>整改后照片 *</label>
+      <label class="upload-box" id="img-box" for="repair_image">
+        <div>📸 点击拍摄整改完成后的现场照片</div>
+        <div class="hint">建议与问题图同一角度拍摄</div>
+      </label>
+      <input type="file" name="repair_image" id="repair_image" accept="image/*" capture="environment"
+             style="display:none" required>
+    </div>
+    <div class="form-row">
+      <label>整改说明</label>
+      <textarea name="remark" placeholder="简要说明整改措施（选填）"></textarea>
+    </div>
+    <button type="submit" class="btn green block">✔ 提交整改</button>
+    <a class="btn gray block mt10" href="javascript:history.back()">返回</a>
+  </form>
+</div>
+<script src="/static/js/app.js"></script>
+<script>bindImageInput('repair_image','img-box');</script>
+</body>
+</html>

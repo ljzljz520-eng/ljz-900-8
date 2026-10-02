@@ -1,0 +1,32 @@
+{extend name="layout/base" /}
+{block name="sidebar"}
+<aside class="sidebar">
+  <a href="/admin">📊 管理看板</a>
+  <a href="/admin/inspection">📝 检查问题</a>
+  <a href="/admin/area" class="active">📍 区域与二维码</a>
+  <a href="/admin/check-item">☑️ 检查项管理</a>
+</aside>
+{/block}
+{block name="content"}
+<div class="page-title">整改二维码 · {$area.name}
+  <button class="btn sm no-print" style="margin-left:auto" onclick="window.print()">🖨 打印张贴</button>
+</div>
+
+<div class="card qr-box" style="max-width:440px;margin:0 auto">
+  <h2 style="margin-bottom:6px">{$area.name}</h2>
+  <p class="muted">{$area.location|default=''}</p>
+  <div style="margin:16px 0">
+    <img id="qr" alt="整改二维码" style="width:260px;height:260px;object-fit:contain"
+      src="https://api.pwmqr.com/qrcode/create/?url={:urlencode($url)}"
+      onerror="this.onerror=null;this.src='https://chart.googleapis.com/chart?cht=qr&chs=260x260&chl={:urlencode($url)}';">
+  </div>
+  <p style="font-size:15px;font-weight:700">📱 微信/相机扫码 → 查看问题 → 拍照整改</p>
+  <p class="muted" style="word-break:break-all;font-size:12px;margin-top:8px">{$url}</p>
+  <div class="mt16 no-print">
+    <a class="btn gray" href="/admin/area">返回区域列表</a>
+  </div>
+  <p class="muted" style="font-size:12px;margin-top:14px">
+    提示: 二维码由在线服务生成, 内网部署时可替换为本地二维码库(如 endroid/qr-code)。
+  </p>
+</div>
+{/block}

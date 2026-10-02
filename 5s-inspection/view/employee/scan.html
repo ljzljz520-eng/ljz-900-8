@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>{$area.name} - 5S整改</title>
+<link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+<div class="mobile">
+  <div class="mobile-header">
+    <h2>📍 {$area.name}</h2>
+    <p>{$area.location|default=''} · 欢迎 {$current_user.real_name}, 请对以下问题拍照整改</p>
+  </div>
+
+  <div class="flex" style="margin:12px 12px 0;gap:8px">
+    <a class="btn sm" href="/employee/tasks">📋 我的全部任务</a>
+    <a class="btn sm gray" href="/logout" style="margin-left:auto">退出</a>
+  </div>
+
+  <h3 style="margin:14px 12px 6px">🔴 待整改（{$pending|count}）</h3>
+  {volist name="pending" id="r"}
+  <div class="m-card">
+    <div class="m-body">
+      <div class="m-title">
+        <span class="badge cat">[{$r.check_item.category}]</span> {$r.check_item.title}
+      </div>
+      <img src="{:asset_url($r.problem_image)}" style="border-radius:8px;margin-top:8px" alt="问题图">
+      <div class="m-meta">
+        <span>📅 {$r.inspect_date}</span>
+        <span>⚠️ 扣 {$r.deduct_score} 分</span>
+        {if $r.assignee}<span>👤 {$r.assignee.real_name}</span>{else}<span class="badge pending">可认领</span>{/if}
+      </div>
+      {if $r.description}<p class="muted mt10" style="font-size:13px">{$r.description}</p>{/if}
+      <a class="btn green block mt10" href="/employee/repair/id/{$r.id}">📷 去整改</a>
+    </div>
+  </div>
+  {/volist}
+  {if $pending->isEmpty()}
+  <div class="m-card"><div class="empty">✅ 本区域暂无待整改问题, 5S 保持良好！</div></div>
+  {/if}
+
+  <h3 style="margin:18px 12px 6px">🟢 最近已整改</h3>
+  {volist name="repaired" id="r"}
+  <div class="m-card">
+    <div class="m-body">
+      <div class="m-title">{$r.check_item.title}</div>
+      <div class="pair mt10">
+        <div class="shot"><span class="tag b">问题</span><img src="{:asset_url($r.problem_image)}"></div>
+        <div class="arrow">➜</div>
+        <div class="shot"><span class="tag a">整改</span><img src="{:asset_url($r.rectification.repair_image)}"></div>
+      </div>
+      <div class="m-meta mt10">
+        <span>整改人: {$r.rectification.repairer.real_name}</span><span>{$r.rectification.repair_time}</span>
+      </div>
+    </div>
+  </div>
+  {/volist}
+</div>
+</body>
+</html>

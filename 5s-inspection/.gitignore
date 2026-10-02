@@ -1,0 +1,21 @@
+*.log
+.env
+composer.phar
+composer.lock
+.DS_Store
+Thumbs.db
+/.idea
+/.vscode
+/vendor
+/.settings
+/.buildpath
+/.project
+# 运行时
+/runtime/*
+!/runtime/.gitkeep
+
+# 用户实际上传照片(保留目录, 忽略内容; demo 演示图保留)
+/public/uploads/problem/*
+!/public/uploads/problem/.gitkeep
+/public/uploads/repair/*
+!/public/uploads/repair/.gitkeep

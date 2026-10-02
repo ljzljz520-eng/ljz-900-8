@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>整改完成</title>
+<link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+<div class="mobile">
+  <div class="mobile-header" style="background:#27ae60">
+    <h2>✅ 整改提交成功</h2>
+    <p>{$row.area.name} · {$row.inspect_no}</p>
+  </div>
+
+  <div class="m-card">
+    <div class="m-body">
+      <div class="m-title">{$row.check_item.title}</div>
+      <div class="pair mt10">
+        <div class="shot">
+          <span class="tag b">问题图 · {$row.inspect_date}</span>
+          <img src="{:asset_url($row.problem_image)}">
+        </div>
+        <div class="arrow">➜</div>
+        {if $row.rectification}
+        <div class="shot">
+          <span class="tag a">整改图</span>
+          <img src="{:asset_url($row.rectification.repair_image)}">
+        </div>
+        {else}
+        <div class="placeholder"><div class="ph-icon">🚧</div><div class="ph-title">整改照片缺失</div></div>
+        {/if}
+      </div>
+      {if $row.rectification}
+      <div class="m-meta mt10">
+        <span>整改人: {$row.rectification.repairer.real_name}</span>
+        <span>{$row.rectification.repair_time}</span>
+      </div>
+      {if $row.rectification.remark}<p class="muted mt10" style="font-size:13px">{$row.rectification.remark}</p>{/if}
+      {/if}
+    </div>
+  </div>
+
+  <div style="margin:12px">
+    <a class="btn block green" href="/employee/tasks">查看我的任务</a>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,61 @@
+{extend name="layout/base" /}
+{block name="sidebar"}
+<aside class="sidebar">
+  <a href="/admin">📊 管理看板</a>
+  <a href="/admin/inspection" class="active">📝 检查问题</a>
+  <a href="/admin/inspection/create">➕ 发布问题</a>
+  <a href="/admin/area">📍 区域与二维码</a>
+  <a href="/admin/check-item">☑️ 检查项管理</a>
+</aside>
+{/block}
+{block name="content"}
+<div class="page-title">问题详情 {$row.inspect_no}
+  {if $row.status==1}<span class="badge done">已整改</span>{else}<span class="badge pending">待整改</span>{/if}
+</div>
+
+<div class="card">
+  <table class="table" style="border:0">
+    <tr><th style="width:110px">所在区域</th><td>{$row.area.name}（{$row.area.location}）</td>
+        <th style="width:110px">检查项</th><td><span class="badge cat">{$row.check_item.category}</span> {$row.check_item.title}</td></tr>
+    <tr><th>扣分</th><td style="color:#e74c3c;font-weight:700">-{$row.deduct_score} 分</td>
+        <th>检查人</th><td>{$row.inspector.real_name}</td></tr>
+    <tr><th>检查日期</th><td>{$row.inspect_date}</td><th>整改期限</th><td>{$row.deadline|default='—'}</td></tr>
+    <tr><th>责任人</th><td>{if $row.assignee}{$row.assignee.real_name}{else}<span class="muted">未指派,区域员工可认领</span>{/if}</td>
+        <th>问题描述</th><td>{$row.description|default='—'}</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <div class="page-title" style="font-size:15px">整改前后对比</div>
+  <div class="pair">
+    <div class="shot">
+      <span class="tag b">问题图 · {$row.inspect_date}</span>
+      <img src="{:asset_url($row.problem_image)}" alt="问题图">
+    </div>
+    <div class="arrow">➜</div>
+    {if $row.rectification}
+    <div class="shot">
+      <span class="tag a">整改图 · {:date('Y-m-d',strtotime($row.rectification.repair_time))}</span>
+      <img src="{:asset_url($row.rectification.repair_image)}" alt="整改图">
+    </div>
+    {else}
+    <div class="placeholder">
+      <div class="ph-icon">🚧</div>
+      <div class="ph-title">尚未提交整改照片</div>
+      <div class="ph-sub">员工扫码完成整改后, 此处自动显示整改图</div>
+      <a class="btn sm" href="/admin/area/qrcode/id/{$row.area_id}">查看区域二维码</a>
+    </div>
+    {/if}
+  </div>
+  {if $row.rectification}
+  <p class="mt10"><b>整改人：</b>{$row.rectification.repairer.real_name}　
+     <b>提交时间：</b>{$row.rectification.repair_time}<br>
+     <b>整改说明：</b>{$row.rectification.remark|default='—'}</p>
+  {/if}
+</div>
+
+<div class="flex no-print">
+  <a class="btn gray" href="/admin/inspection">返回列表</a>
+  <button class="btn danger" onclick="confirmPost('/admin/inspection/delete/id/{$row.id}','确定删除该问题?')">删除记录</button>
+</div>
+{/block}

@@ -1,0 +1,62 @@
+{extend name="layout/base" /}
+{block name="sidebar"}
+<aside class="sidebar">
+  <a href="/admin" class="active">📊 管理看板</a>
+  <a href="/admin/inspection">📝 检查问题</a>
+  <a href="/admin/inspection/create">➕ 发布问题</a>
+  <a href="/admin/area">📍 区域与二维码</a>
+  <a href="/admin/check-item">☑️ 检查项管理</a>
+</aside>
+{/block}
+{block name="content"}
+<div class="page-title">管理看板</div>
+
+<div class="stat-grid">
+  <div class="stat blue"><div class="label">问题总数</div><div class="num">{$total}</div></div>
+  <div class="stat red"><div class="label">待整改</div><div class="num">{$pending}</div></div>
+  <div class="stat green"><div class="label">已整改</div><div class="num">{$repaired}</div></div>
+  <div class="stat orange"><div class="label">整改完成率</div><div class="num">{$rate}%</div></div>
+  <div class="stat"><div class="label">累计扣分</div><div class="num">{$deduct}</div></div>
+</div>
+
+<div class="card">
+  <div class="page-title" style="font-size:15px">各区域整改情况</div>
+  <table class="table">
+    <thead><tr><th>区域</th><th>问题数</th><th>待整改</th><th>完成率</th><th>二维码</th></tr></thead>
+    <tbody>
+    {volist name="areaStats" id="a"}
+      <tr>
+        <td>{$a.name}</td>
+        <td>{$a.total}</td>
+        <td>{if $a.pending>0}<span class="badge pending">{$a.pending} 待整改</span>{else}0{/if}</td>
+        <td>{if $a.total>0}{:round(($a.total-$a.pending)/$a.total*100,1)}{else}100.0{/if}%</td>
+        <td><a class="btn sm" href="/admin/area/qrcode/id/{$a.id}">查看二维码</a></td>
+      </tr>
+    {/volist}
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <div class="page-title" style="font-size:15px">最近问题 <a class="btn sm" style="float:right" href="/admin/inspection">全部</a></div>
+  <table class="table">
+    <thead><tr><th>单号</th><th>区域</th><th>检查项</th><th>扣分</th><th>责任人</th><th>状态</th><th>日期</th></tr></thead>
+    <tbody>
+    {volist name="latest" id="r"}
+      <tr>
+        <td><a href="/admin/inspection/detail/id/{$r.id}">{$r.inspect_no}</a></td>
+        <td>{$r.area.name}</td>
+        <td>{$r.check_item.title}</td>
+        <td>-{$r.deduct_score}</td>
+        <td>{$r.assignee.real_name|default='未指派'}</td>
+        <td>{if $r.status==1}<span class="badge done">已整改</span>{else}<span class="badge pending">待整改</span>{/if}</td>
+        <td>{$r.inspect_date}</td>
+      </tr>
+    {/volist}
+    {if $latest->isEmpty()}
+      <tr><td colspan="7" class="empty">暂无检查记录</td></tr>
+    {/if}
+    </tbody>
+  </table>
+</div>
+{/block}

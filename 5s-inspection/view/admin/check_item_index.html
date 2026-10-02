@@ -1,0 +1,93 @@
+{extend name="layout/base" /}
+{block name="sidebar"}
+<aside class="sidebar">
+  <a href="/admin">📊 管理看板</a>
+  <a href="/admin/inspection">📝 检查问题</a>
+  <a href="/admin/inspection/create">➕ 发布问题</a>
+  <a href="/admin/area">📍 区域与二维码</a>
+  <a href="/admin/check-item" class="active">☑️ 检查项管理</a>
+</aside>
+{/block}
+{block name="content"}
+<div class="page-title">5S 检查项管理</div>
+
+<form class="filter-bar" method="get">
+  <div class="f"><label>5S 分类</label>
+    <select name="category" onchange="this.form.submit()">
+      <option value="">全部分类</option>
+      {volist name="categoryMap" id="cn" key="ck"}
+      <option value="{$ck}" {if $category==$ck}selected{/if}>{$cn}</option>
+      {/volist}
+    </select>
+  </div>
+</form>
+
+<div class="card">
+  <div class="page-title" style="font-size:15px">➕ 新增/编辑检查项</div>
+  <form onsubmit="return postForm(this)" action="/admin/check-item/save">
+    <input type="hidden" name="id" id="ci-id">
+    <div class="form-grid">
+      <div class="form-row"><label>5S 分类 *</label>
+        <select name="category" id="ci-category">
+          {volist name="categoryMap" id="cn" key="ck"}<option value="{$ck}">{$cn}</option>{/volist}
+        </select>
+      </div>
+      <div class="form-row"><label>标题 *</label><input type="text" name="title" id="ci-title" required></div>
+      <div class="form-row"><label>默认扣分</label><input type="number" name="default_score" id="ci-score" value="10" min="0" max="100" step="0.5"></div>
+      <div class="form-row"><label>排序 / 状态</label>
+        <div class="flex">
+          <input type="number" name="sort" id="ci-sort" value="0" style="width:90px">
+          <select name="status" id="ci-status" style="width:110px"><option value="1">启用</option><option value="0">停用</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="form-row"><label>判定标准</label><textarea name="standard" id="ci-standard"></textarea></div>
+    <button class="btn green" type="submit">保存检查项</button>
+    <button type="button" class="btn gray" onclick="resetCI()">清空</button>
+  </form>
+</div>
+
+<div class="card" style="padding:0;overflow-x:auto">
+<table class="table">
+  <thead><tr><th>ID</th><th>分类</th><th>检查项</th><th>判定标准</th><th>默认扣分</th><th>状态</th><th>操作</th></tr></thead>
+  <tbody>
+  {volist name="list" id="it"}
+  <tr>
+    <td>{$it.id}</td>
+    <td><span class="badge cat">{$categoryMap[$it['category']]}</span></td>
+    <td><b>{$it.title}</b></td>
+    <td class="muted" style="max-width:340px">{$it.standard|default='—'}</td>
+    <td>-{$it.default_score}</td>
+    <td>{if $it.status==1}<span class="badge done">启用</span>{else}<span class="badge pending">停用</span>{/if}</td>
+    <td><button class="btn sm gray"
+      data-id="{$it.id}" data-cat="{$it.category}" data-title="{$it.title}"
+      data-standard="{$it.standard|default=''}" data-score="{$it.default_score}"
+      data-sort="{$it.sort}" data-status="{$it.status}" onclick="editCI(this)">编辑</button></td>
+  </tr>
+  {/volist}
+  {if $list->isEmpty()}<tr><td colspan="7" class="empty">暂无检查项</td></tr>{/if}
+  </tbody>
+</table>
+</div>
+<div class="pagination">{$list->render()|raw}</div>
+{/block}
+{block name="script"}
+<script>
+function v(s){ return s===null ? '' : s; }
+function resetCI(){
+  ['ci-id','ci-title','ci-standard'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('ci-score').value=10;document.getElementById('ci-sort').value=0;document.getElementById('ci-status').value=1;
+}
+function editCI(b){
+  var d=b.dataset;
+  document.getElementById('ci-id').value=d.id;
+  document.getElementById('ci-category').value=d.cat;
+  document.getElementById('ci-title').value=d.title;
+  document.getElementById('ci-standard').value=d.standard;
+  document.getElementById('ci-score').value=d.score;
+  document.getElementById('ci-sort').value=d.sort;
+  document.getElementById('ci-status').value=d.status;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+{/block}

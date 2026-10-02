@@ -1,0 +1,83 @@
+{extend name="layout/base" /}
+{block name="sidebar"}
+<aside class="sidebar">
+  <a href="/admin">📊 管理看板</a>
+  <a href="/admin/inspection">📝 检查问题</a>
+  <a href="/admin/inspection/create" class="active">➕ 发布问题</a>
+  <a href="/admin/area">📍 区域与二维码</a>
+  <a href="/admin/check-item">☑️ 检查项管理</a>
+</aside>
+{/block}
+{block name="content"}
+<div class="page-title">➕ 发布检查问题</div>
+
+<div class="card" style="max-width:860px">
+  <form action="/admin/inspection/save" method="post" enctype="multipart/form-data" onsubmit="return postForm(this)">
+    <div class="form-grid">
+      <div class="form-row">
+        <label>检查区域 <span class="req">*</span></label>
+        <select name="area_id" required>
+          <option value="">请选择区域</option>
+          {volist name="areas" id="a"}<option value="{$a.id}">{$a.name}</option>{/volist}
+        </select>
+        <div class="hint">区域张贴二维码后, 员工扫码即可看到该区域问题</div>
+      </div>
+      <div class="form-row">
+        <label>检查项 <span class="req">*</span></label>
+        <select name="check_item_id" id="check_item_id" required>
+          <option value="">请选择检查项</option>
+          {volist name="items" id="it"}
+          <option value="{$it.id}" data-score="{$it.default_score}">
+            [{$it.category}] {$it.title}（建议扣 {$it.default_score} 分）
+          </option>
+          {/volist}
+        </select>
+      </div>
+      <div class="form-row">
+        <label>扣分 <span class="req">*</span></label>
+        <input type="number" name="deduct_score" id="deduct_score" value="10" min="0" max="100" step="0.5" required>
+      </div>
+      <div class="form-row">
+        <label>指派整改员工</label>
+        <select name="assignee_id">
+          <option value="0">不指定（该区域员工扫码均可认领）</option>
+          {volist name="staff" id="s"}<option value="{$s.id}">{$s.real_name}（{$s.username}）</option>{/volist}
+        </select>
+      </div>
+      <div class="form-row">
+        <label>检查日期 <span class="req">*</span></label>
+        <input type="date" name="inspect_date" value="{:date('Y-m-d')}" required>
+      </div>
+      <div class="form-row">
+        <label>整改期限</label>
+        <input type="date" name="deadline">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label>问题描述</label>
+      <textarea name="description" placeholder="描述现场存在的问题、位置、影响等"></textarea>
+    </div>
+
+    <div class="form-row">
+      <label>问题照片 <span class="req">*</span></label>
+      <label class="upload-box" id="img-box" for="problem_image">
+        <div>📷 点击上传现场问题照片（jpg/png，≤8MB）</div>
+        <div class="hint">建议现场直接拍摄, 照片将同步展示给整改员工与老板</div>
+      </label>
+      <input type="file" name="problem_image" id="problem_image" accept="image/*" capture="environment" style="display:none" required>
+    </div>
+
+    <div class="flex mt16">
+      <button type="submit" class="btn green">✔ 发布问题</button>
+      <a class="btn gray" href="/admin/inspection">返回列表</a>
+    </div>
+  </form>
+</div>
+{/block}
+{block name="script"}
+<script>
+bindImageInput('problem_image','img-box');
+bindItemScore('check_item_id','deduct_score');
+</script>
+{/block}

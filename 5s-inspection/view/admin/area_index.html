@@ -1,0 +1,74 @@
+{extend name="layout/base" /}
+{block name="sidebar"}
+<aside class="sidebar">
+  <a href="/admin">📊 管理看板</a>
+  <a href="/admin/inspection">📝 检查问题</a>
+  <a href="/admin/inspection/create">➕ 发布问题</a>
+  <a href="/admin/area" class="active">📍 区域与二维码</a>
+  <a href="/admin/check-item">☑️ 检查项管理</a>
+</aside>
+{/block}
+{block name="content"}
+<div class="page-title">区域与整改二维码</div>
+<div class="card">
+  <div class="page-title" style="font-size:15px">➕ 新增/编辑区域</div>
+  <form onsubmit="return postForm(this)" action="/admin/area/save">
+    <input type="hidden" name="id" id="f-id">
+    <div class="form-grid">
+      <div class="form-row"><label>区域名称 *</label><input type="text" id="f-name" name="name" required></div>
+      <div class="form-row"><label>区域编码</label><input type="text" id="f-code" name="code"></div>
+      <div class="form-row"><label>位置描述</label><input type="text" id="f-location" name="location"></div>
+      <div class="form-row"><label>排序/状态</label>
+        <div class="flex">
+          <input type="number" id="f-sort" name="sort" value="0" style="width:90px">
+          <select name="status" id="f-status" style="width:110px"><option value="1">启用</option><option value="0">停用</option></select>
+        </div>
+      </div>
+    </div>
+    <button class="btn green" type="submit">保存区域</button>
+    <button type="button" class="btn gray" onclick="resetForm()">清空</button>
+  </form>
+</div>
+
+<div class="card" style="padding:0;overflow-x:auto">
+<table class="table">
+  <thead><tr><th>ID</th><th>区域</th><th>编码</th><th>位置</th><th>问题/待整改</th><th>状态</th><th>操作</th></tr></thead>
+  <tbody>
+  {volist name="list" id="a"}
+  <tr>
+    <td>{$a.id}</td>
+    <td><b>{$a.name}</b></td>
+    <td>{$a.code|default='—'}</td>
+    <td class="muted">{$a.location|default='—'}</td>
+    <td>{$a.total} / {if $a.pending>0}<span class="badge pending">{$a.pending}</span>{else}0{/if}</td>
+    <td>{if $a.status==1}<span class="badge done">启用</span>{else}<span class="badge pending">停用</span>{/if}</td>
+    <td nowrap>
+      <a class="btn sm" href="/admin/area/qrcode/id/{$a.id}">二维码</a>
+      <button class="btn sm gray" data-id="{$a.id}" data-name="{$a.name}" data-code="{$a.code|default=''}"
+        data-location="{$a.location|default=''}" data-sort="{$a.sort}" data-status="{$a.status}"
+        onclick="editArea(this)">编辑</button>
+    </td>
+  </tr>
+  {/volist}
+  </tbody>
+</table>
+</div>
+{/block}
+{block name="script"}
+<script>
+function resetForm(){
+  ['f-id','f-name','f-code','f-location'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('f-sort').value=0;document.getElementById('f-status').value='1';
+}
+function editArea(btn){
+  var d = btn.dataset;
+  document.getElementById('f-id').value = d.id;
+  document.getElementById('f-name').value = d.name;
+  document.getElementById('f-code').value = d.code;
+  document.getElementById('f-location').value = d.location;
+  document.getElementById('f-sort').value = d.sort;
+  document.getElementById('f-status').value = d.status;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+</script>
+{/block}

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{$title|default='仓库现场5S检查平台'}</title>
+<link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">🏭 仓库现场 5S 检查平台</div>
+  <nav>
+    <a href="{$nav_home|default='/'}">{$nav_label|default='首页'}</a>
+  </nav>
+  <div class="user">
+    <span class="role-tag">{$role_label|default=''}</span>
+    <span>{$current_user.real_name|default=''}</span>
+    <a href="/logout" style="color:#dcebfb;font-size:13px">退出</a>
+  </div>
+</header>
+<div class="layout">
+  {block name="sidebar"}{/block}
+  <main class="content">
+    {block name="content"}{/block}
+  </main>
+</div>
+<script src="/static/js/app.js"></script>
+{block name="script"}{/block}
+</body>
+</html>
