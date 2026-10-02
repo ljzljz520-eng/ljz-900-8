@@ -1,0 +1,46 @@
+{include file="common/header" /}
+<div class="page-head"><h2>问题整改</h2></div>
+<div class="card">
+  <div class="pair-body">
+    <div class="pair-img">
+      <div class="pair-label label-before">整改前（问题图）</div>
+      <a href="{$inspection.problem_image}" target="_blank"><img src="{$inspection.problem_image}" alt="问题图"></a>
+    </div>
+    <div class="pair-arrow">➜</div>
+    <div class="pair-img">
+      <div class="pair-label label-after">整改后（请上传）</div>
+      <img id="prevImg" class="preview-full hidden" alt="整改图预览">
+      <div class="img-placeholder" id="prevTip"><span>📷</span>上传整改后照片</div>
+    </div>
+  </div>
+  <div class="muted mt">
+    区域：<b>{$inspection.area.name}</b> ｜ 检查项：<b>{$inspection.item.name}</b>（{$inspection.item.category}）｜ 扣分：<span class="text-red">-{:(float)$inspection['deduct_score']}分</span>
+  </div>
+  {if condition="$inspection.remark neq ''"}
+  <div class="muted">问题描述：{$inspection.remark}</div>
+  {/if}
+  <form method="post" action="/staff/rectify/{$inspection.id}" enctype="multipart/form-data" class="mt">
+    <div class="form-row">
+      <label>整改后图片 *</label>
+      <input type="file" name="image" accept="image/*" capture="environment" required onchange="previewImg(this)">
+    </div>
+    <div class="form-row">
+      <label>整改说明</label>
+      <textarea name="remark" rows="2" placeholder="整改情况说明（可选）"></textarea>
+    </div>
+    <button class="btn btn-primary" type="submit">提交整改</button>
+    <a class="btn" href="javascript:history.back()">返回</a>
+  </form>
+</div>
+<script>
+function previewImg(input) {
+  var img = document.getElementById('prevImg');
+  var tip = document.getElementById('prevTip');
+  if (input.files && input.files[0]) {
+    img.src = URL.createObjectURL(input.files[0]);
+    img.classList.remove('hidden');
+    tip.classList.add('hidden');
+  }
+}
+</script>
+{include file="common/footer" /}

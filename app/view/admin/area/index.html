@@ -1,0 +1,48 @@
+{include file="common/header" /}
+<div class="page-head"><h2>区域二维码</h2></div>
+
+<div class="card">
+  <form method="post" action="/admin/area" class="inline-form">
+    <input type="text" name="name" placeholder="区域名称，如：A区-原材料库" required>
+    <input type="text" name="code" placeholder="编码（留空自动生成）">
+    <input type="number" name="sort" value="0" title="排序" placeholder="排序">
+    <button class="btn btn-primary" type="submit">＋ 添加区域</button>
+  </form>
+  <p class="muted mt">员工扫码登录后即可看到该区域待整改问题，可将二维码打印张贴在对应区域。二维码内容：<b>/staff/scan?code=区域编码</b></p>
+</div>
+
+<div class="card table-card">
+<table class="table">
+  <thead><tr><th>ID</th><th>区域</th><th>编码</th><th>二维码</th><th>扫码链接</th><th>状态</th></tr></thead>
+  <tbody>
+  {volist name="areas" id="a"}
+    <tr>
+      <td>{$a.id}</td>
+      <td>{$a.name}</td>
+      <td><b>{$a.code}</b></td>
+      <td><div class="qr" data-url="{$domain}/staff/scan?code={$a.code}"></div></td>
+      <td class="muted">{$domain}/staff/scan?code={$a.code}</td>
+      <td>
+        {if condition="$a.status eq 1"}<span class="badge badge-ok">启用</span>
+        {else /}<span class="badge">停用</span>{/if}
+      </td>
+    </tr>
+  {/volist}
+  </tbody>
+</table>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+// 在线时用 qrcodejs 直接生成；离线环境提示用链接自行生成
+if (window.QRCode) {
+  document.querySelectorAll('.qr').forEach(function (el) {
+    new QRCode(el, { text: el.dataset.url, width: 90, height: 90 });
+  });
+} else {
+  document.querySelectorAll('.qr').forEach(function (el) {
+    el.innerHTML = '<span class="muted">请用扫码链接自行生成</span>';
+  });
+}
+</script>
+{include file="common/footer" /}

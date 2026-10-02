@@ -1,0 +1,59 @@
+{include file="common/header" /}
+<div class="page-head">
+  <h2>问题记录</h2>
+  <a class="btn btn-primary" href="/admin/inspection/create">＋ 发布问题</a>
+</div>
+
+<form class="filter-bar" method="get" action="/admin/inspection">
+  <select name="area_id">
+    <option value="0">全部区域</option>
+    {volist name="areas" id="a"}
+    <option value="{$a.id}" {:$areaId == $a['id'] ? 'selected' : ''}>{$a.name}</option>
+    {/volist}
+  </select>
+  <select name="status">
+    <option value="" {:$status === '' ? 'selected' : ''}>全部状态</option>
+    <option value="0" {:$status === '0' ? 'selected' : ''}>待整改</option>
+    <option value="1" {:$status === '1' ? 'selected' : ''}>已整改</option>
+  </select>
+  <button class="btn" type="submit">筛选</button>
+</form>
+
+<div class="card table-card">
+<table class="table">
+  <thead>
+    <tr><th>ID</th><th>区域</th><th>检查项</th><th>扣分</th><th>问题图</th><th>整改图</th><th>整改人</th><th>状态</th><th>时间</th><th>操作</th></tr>
+  </thead>
+  <tbody>
+  {volist name="list" id="vo"}
+    <tr>
+      <td>{$vo.id}</td>
+      <td>{$vo.area.name}</td>
+      <td><span class="tag">{$vo.item.category}</span> {$vo.item.name}</td>
+      <td class="text-red">-{:(float)$vo['deduct_score']}</td>
+      <td><a href="{$vo.problem_image}" target="_blank"><img class="thumb" src="{$vo.problem_image}" alt="问题图"></a></td>
+      <td>
+        {if condition="$vo.status eq 1"}
+        <a href="{$vo.rectification.rectified_image}" target="_blank"><img class="thumb" src="{$vo.rectification.rectified_image}" alt="整改图"></a>
+        {else /}
+        <span class="mini-placeholder">待整改</span>
+        {/if}
+      </td>
+      <td>{$vo.rectification.user.real_name|default='-'}</td>
+      <td>
+        {if condition="$vo.status eq 1"}<span class="badge badge-ok">已整改</span>
+        {else /}<span class="badge badge-warn">待整改</span>{/if}
+      </td>
+      <td>{$vo.created_at}</td>
+      <td>
+        <form method="post" action="/admin/inspection/delete/{$vo.id}" onsubmit="return confirm('确定删除该问题记录？')">
+          <button class="btn btn-sm" type="submit">删除</button>
+        </form>
+      </td>
+    </tr>
+  {/volist}
+  </tbody>
+</table>
+</div>
+<div class="page">{:$list->render()}</div>
+{include file="common/footer" /}

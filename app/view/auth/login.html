@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>登录 - 仓库5S检查系统</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="login-body">
+<div class="login-card">
+  <h1>🏭 仓库5S检查系统</h1>
+  <p class="login-sub">整理 · 整顿 · 清扫 · 清洁 · 素养</p>
+  {if condition="session('?error')"}
+  <div class="alert alert-err">{:session('error')}{:session('error', null)}</div>
+  {/if}
+  <form method="post" action="/login">
+    <input type="hidden" name="redirect" value="{$redirect|default='/'}">
+    <label>账号</label>
+    <input type="text" name="username" required autofocus placeholder="请输入账号">
+    <label>密码</label>
+    <input type="password" name="password" required placeholder="请输入密码">
+    <button type="submit" class="btn btn-primary btn-block">登 录</button>
+  </form>
+  <p class="login-tip">演示账号：admin / boss / zhangsan，密码均为 123456</p>
+</div>
+</body>
+</html>

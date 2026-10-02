@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{$title|default='仓库5S检查系统'}</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<nav class="topnav">
+  <a class="brand" href="/">🏭 仓库5S</a>
+  <div class="links">
+    {if condition="session('user.role') eq 'admin'"}
+    <a href="/admin/inspection">问题记录</a>
+    <a href="/admin/inspection/create">＋发布问题</a>
+    <a href="/admin/item">检查项</a>
+    <a href="/admin/area">区域二维码</a>
+    {elseif condition="session('user.role') eq 'staff'" /}
+    <a href="/staff/pending">待整改</a>
+    {elseif condition="session('user.role') eq 'boss'" /}
+    <a href="/boss/report">整改报告</a>
+    {/if}
+  </div>
+  <div class="user">
+    <span>{:session('user.real_name')}</span>
+    <a href="/logout">退出</a>
+  </div>
+</nav>
+<main class="container">
+{if condition="session('?ok')"}
+<div class="alert alert-ok">{:session('ok')}{:session('ok', null)}</div>
+{/if}
+{if condition="session('?error')"}
+<div class="alert alert-err">{:session('error')}{:session('error', null)}</div>
+{/if}

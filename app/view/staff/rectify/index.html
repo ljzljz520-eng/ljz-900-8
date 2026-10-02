@@ -1,0 +1,22 @@
+{include file="common/header" /}
+<div class="page-head">
+  <h2>{if condition="!empty($area)"}【{$area.name}】{/if}待整改问题</h2>
+  {if condition="!empty($area)"}<a class="btn" href="/staff/pending">查看全部区域</a>{/if}
+</div>
+
+{if condition="count($list) eq 0"}
+<div class="card empty">🎉 当前没有待整改问题</div>
+{else /}
+{volist name="list" id="vo"}
+<div class="card todo-card">
+  <a href="{$vo.problem_image}" target="_blank"><img class="todo-img" src="{$vo.problem_image}" alt="问题图"></a>
+  <div class="todo-info">
+    <div><span class="tag">{$vo.area.name}</span> <b>{$vo.item.name}</b> <span class="text-red">-{:(float)$vo['deduct_score']}分</span></div>
+    <div class="muted">{$vo.item.category} · 发布于 {$vo.created_at}</div>
+    {if condition="$vo.remark neq ''"}<div class="muted">问题描述：{$vo.remark}</div>{/if}
+  </div>
+  <a class="btn btn-primary" href="/staff/rectify/{$vo.id}">去整改</a>
+</div>
+{/volist}
+{/if}
+{include file="common/footer" /}
